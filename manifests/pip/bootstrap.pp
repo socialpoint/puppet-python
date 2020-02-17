@@ -5,7 +5,7 @@
 # @param manage_python if python module will manage deps
 # @param http_proxy Proxy server to use for outbound connections.
 #
-# @example 
+# @example
 #   class { 'python::pip::bootstrap':
 #     version => 'pip',
 #   }
@@ -31,13 +31,16 @@ class python::pip::bootstrap (
       }
     }
 
+    ensure_packages(['curl'])
+
     if $version == 'pip3' {
+
       exec { 'bootstrap pip3':
         command     => '/usr/bin/curl https://bootstrap.pypa.io/get-pip.py | python3',
         environment => $environ,
-        unless      => 'which pip3',
+        creates     => "${target_src_pip_path}/pip${facts['python3_release']}",
         path        => $python::params::pip_lookup_path,
-        require     => Package['python3'],
+        require     => [Package['python3'], Package['curl']],
         provider    => $exec_provider,
       }
       # puppet is opinionated about the pip command name
@@ -48,12 +51,13 @@ class python::pip::bootstrap (
         require => Exec['bootstrap pip3'],
       }
     } else {
+
       exec { 'bootstrap pip':
         command     => '/usr/bin/curl https://bootstrap.pypa.io/get-pip.py | python',
         environment => $environ,
-        unless      => 'which pip',
+        creates     => "${target_src_pip_path}/pip${facts['python2_release']}",
         path        => $python::params::pip_lookup_path,
-        require     => Package['python'],
+        require     => [Package['python'], Package['curl']],
         provider    => $exec_provider,
       }
       # puppet is opinionated about the pip command name
