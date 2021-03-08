@@ -53,7 +53,7 @@ class python::pip::bootstrap (
     } else {
 
       exec { 'bootstrap pip':
-        command     => '/usr/bin/curl https://bootstrap.pypa.io/2.7/get-pip.py | python',
+        command     => '/usr/bin/curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python',
         environment => $environ,
         creates     => "${target_src_pip_path}/pip${facts['python2_release']}",
         path        => $python::params::pip_lookup_path,
